@@ -1,21 +1,29 @@
 
 // Set up Express
 const express = require("express");
-const session = require("express-session");
 const app = express();
-app.set("view engine", "ejs");
-app.use(express.static("public"));
-app.use(session({'secret':'343ji43j4n3jn4jk3n'}));
-
-// Other Dependencies
+const session = require("express-session");
 const request = require("request");
 const mysql = require("mysql");
-const tools = require("./tools.js");
+const bcrypt = require("bcrypt");
+
+app.set("view engine", "ejs");
+app.use(express.static("public"));
+app.use(session({
+  secret : '343ji43j4n3jn4jk3n',
+  resave : true,
+  saveUninitialized : true
+}));
+app.use(express.urlencoded({extended: true}));
 
 // Routes
 
 app.get("/", function(req, res) {
-  res.send("Hello World!");
+  res.render("index");
+}); // Main Route
+
+app.post("/", function(req, res) {
+  res.send("This is the root with post!");
 }); // Main Route
 
 // Local Server Listener
