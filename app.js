@@ -22,9 +22,42 @@ app.get("/", function(req, res) {
   res.render("index");
 }); // Main Route
 
-app.post("/", function(req, res) {
-  res.send("This is the root with post!");
+app.post("/", async function(req, res) {
+  let username = req.body.username;
+  let password = req.body.password;
+  let hashedPwd = "$2a$10$CoYQ4Gil4k3S5P.Px/7csejON9ovh7nsCO5.3cMhgtLmwEDzDesyC";
+  let passwordMatch = await checkPassword(password, hashedPwd);
+  
+  console.log("passwordMatch" + passwordMatch);
+  
+  if (username == "admin" && passwordMatch) {
+    req.session.authenticated = true;
+    res.render("welcome");
+  } else {
+    res.render("index", {"loginError": true});
+  }
 }); // Main Route
+
+app.get("/myAccount", function(req, res) {
+  if (req.session.authenticated) {
+    res.render("account");
+  } else {
+    res.redirect("/");
+  }
+});
+
+
+// Uses Bcrypt to see if a password is valid
+function checkPassword(password, hashedValue) {
+  return new Promise( function(resolve, reject) {
+    bcrypt.compare(password, hashedValue, function(err, result) {
+      console.log("Result: " + result);
+      resolve(result);
+    })
+  })
+}
+
+
 
 // Local Server Listener
 
